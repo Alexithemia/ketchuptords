@@ -1,0 +1,40 @@
+service: aws-nodejs
+provider:
+  name: aws
+  runtime: nodejs8.10
+  stage: dev
+  # change region if applicable
+  region: us-west-2
+  iamRoleStatements:
+  - Effect: "Allow"
+    Action:
+      - sqs:SendMessage
+      - sqs:ReceiveMessage
+      - sqs:DeleteMessage
+      - sqs:GetQueueAttributes
+    # input sqs specific ARN ex "arn:aws:sqs:us-east-22:13194933:cookie-queue"
+    Resource: ""
+  - Effect: "Allow"
+    Action:
+      - sqs:ListQueues
+    # input sqs ARN with * replacing sqs name, ex "arn:aws:sqs:us-east-22:13194933:*"
+    Resource: ""
+functions:
+  ketchuptords:
+    handler: index.handler
+    environment:
+      # PGDATABASE: database name
+      # PGHOST: aws database endpoint
+      # PGPORT: database port
+      # PGUSER: master username for database
+      # PGPASSWORD: master password for database
+      PGDATABASE: ""
+      PGHOST: ""
+      PGPORT: 5432
+      PGUSER: ""
+      PGPASSWORD: ""
+    events:
+    - sqs:
+        # input sqs specific ARN ex "arn:aws:sqs:us-east-22:13194933:cookie-queue"
+        arn: ""
+        batchSize: 1
