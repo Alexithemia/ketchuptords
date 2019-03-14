@@ -5,9 +5,17 @@ exports.handler = async function (event, context, callback) {
   const client = new Client();
   await client.connect();
 
-  await client.query(`CREATE TABLE IF NOT EXISTS ${message.key.stringValue} (id SERIAL PRIMARY KEY, user_id INT, metric CHAR(20) NOT NULL, value DECIMAL NOT NULL)`);
-
-  await client.query(`INSERT INTO ${message.key.stringValue} (value, metric, user_id) VALUES (${parseFloat(message.value.stringValue)}, '${message.metric.stringValue}', ${parseInt(message.user_id.stringValue)})`);
+  if (message.public.stringValue === 'true') {
+    await client.query({
+      text: "INSERT INTO events (value, metric, user_name, client_id) VALUES ($1,$2,$3,$4)",
+      values: [parseFloat(message.value.stringValue), message.metric.stringValue, message.user_name.stringValue, parseInt(message.client_id.stringValue)]
+    })
+  } else {
+    await client.query({
+      text: "INSERT INTO events (value, metric, user_name, client_id, public) VALUES ($1,$2,$3,$4,$5)",
+      values: [parseFloat(message.value.stringValue), message.metric.stringValue, message.user_name.stringValue, parseInt(message.client_id.stringValue), false]
+    })
+  }
 
   await client.end();
 };
