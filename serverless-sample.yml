@@ -1,4 +1,4 @@
-service: aws-nodejs
+service: RDS
 provider:
   name: aws
   runtime: nodejs8.10
